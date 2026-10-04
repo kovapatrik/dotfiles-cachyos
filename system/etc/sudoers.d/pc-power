@@ -1,0 +1,1 @@
+pc-power ALL=(root) NOPASSWD: /usr/bin/systemctl suspend, /usr/bin/systemctl poweroff

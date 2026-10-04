@@ -1,0 +1,10 @@
+[Unit]
+Description=TV off before suspend (Homebridge button)
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pc-tv-notify sleep
+
+[Install]
+WantedBy=sleep.target

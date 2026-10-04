@@ -1,0 +1,10 @@
+[Unit]
+Description=Turn off RGB lighting (RAM, GPU, motherboard, NZXT)
+After=systemd-modules-load.service
+
+[Service]
+Type=exec
+ExecStart=/usr/local/bin/rgb-off
+
+[Install]
+WantedBy=multi-user.target

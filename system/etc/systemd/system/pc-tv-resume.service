@@ -1,0 +1,10 @@
+[Unit]
+Description=TV on after resume (Homebridge button)
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pc-tv-notify wake
+
+[Install]
+WantedBy=suspend.target

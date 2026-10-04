@@ -1,0 +1,12 @@
+#!/bin/sh
+# Presses the Homebridge Dummy button: wake = single press (TV on), sleep = double press (TV off)
+. /etc/pc-tv.conf
+case "$1" in
+  wake)  value=0; retry="--retry 15 --retry-delay 2 --retry-all-errors" ;;
+  sleep) value=1; retry="" ;;
+  *)     echo "usage: pc-tv-notify wake|sleep" >&2; exit 2 ;;
+esac
+# shellcheck disable=SC2086
+curl -fsS --max-time 3 $retry \
+  "${WEBHOOK_BASE}?id=${ACCESSORY_ID}&set=ProgrammableSwitchEvent&value=${value}" \
+  && echo "pc-tv: sent $1" || { echo "pc-tv: failed to send $1" >&2; exit 0; }

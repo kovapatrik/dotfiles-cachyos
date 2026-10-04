@@ -1,0 +1,8 @@
+#!/bin/sh
+# Turns off RAM, GPU, motherboard and NZXT lighting (mouse and controller are left alone)
+exec openrgb --noautoconnect \
+  -d 0 -m off -d 1 -m off \
+  -d "PowerColor Red Devil RX6800XT" -m off \
+  -d "MSI MAG X570 TOMAHAWK WIFI (MS-7C84)" -m static -c 000000 \
+  -d "NZXT Smart Device V2" -m static -c 000000 \
+  -d "NZXT Kraken X3 Series" -m direct -c 000000

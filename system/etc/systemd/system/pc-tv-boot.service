@@ -1,0 +1,13 @@
+[Unit]
+Description=TV on at boot, TV off at shutdown (Homebridge button)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/pc-tv-notify wake
+ExecStop=/usr/local/bin/pc-tv-notify sleep
+
+[Install]
+WantedBy=multi-user.target
