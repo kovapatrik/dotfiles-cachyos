@@ -29,13 +29,20 @@ echo "==> Hermes"
 put 644 /etc/modprobe.d/hermes-evdi.conf
 systemctl --user enable hermes.service
 
-echo "==> Homebridge (pc-power SSH user + TV webhook)"
+echo "==> pc-power SSH user (Homebridge + Home Assistant) + TV webhook"
 if ! getent passwd pc-power >/dev/null; then
     sudo useradd --system --create-home --home-dir /var/lib/pc-power --shell /bin/sh pc-power
 fi
 sudo install -d -m 700 -o pc-power -g pc-power /var/lib/pc-power/.ssh
-echo 'restrict,command="/usr/local/bin/pc-power" {{ .homebridge.pcPowerKey }}' \
-    | sudo install -m 600 -o pc-power -g pc-power /dev/stdin /var/lib/pc-power/.ssh/authorized_keys
+# Keys of whichever of Homebridge / Home Assistant were given one (both may be set)
+{
+    :
+{{- range $key := list .homebridge.pcPowerKey .homeassistant.pcPowerKey }}
+{{-   if $key }}
+    echo 'restrict,command="/usr/local/bin/pc-power" {{ $key }}'
+{{-   end }}
+{{- end }}
+} | sudo install -m 600 -o pc-power -g pc-power /dev/stdin /var/lib/pc-power/.ssh/authorized_keys
 put 755 /usr/local/bin/pc-power
 put 755 /usr/local/bin/pc-tv-notify
 sudo visudo -cf "$src/system/etc/sudoers.d/pc-power"   # a broken sudoers file would lock out sudo
@@ -75,7 +82,7 @@ sudo ufw allow in on tailscale0
 sudo ufw allow 41641/udp
 sudo ufw allow from "$lan" to any port 47984,47989,48010 proto tcp   # Hermes streaming
 sudo ufw allow from "$lan" to any port 47998:48010 proto udp         # Hermes streaming
-sudo ufw allow from "$lan" to any port 22 proto tcp                  # SSH (Homebridge)
+sudo ufw allow from "$lan" to any port 22 proto tcp                  # SSH (pc-power: Homebridge / Home Assistant)
 sudo ufw --force enable
 sudo systemctl enable ufw.service
 

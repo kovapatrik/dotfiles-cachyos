@@ -1,7 +1,27 @@
+{{- /* Where pc-tv-notify reports the PC's power changes. Only the chosen target's details
+       are prompted for; the other target's values are kept if already set, so switching
+       back and forth never asks twice. Switch with `chezmoi edit-config` + `chezmoi init`. */ -}}
+{{- $tvTarget := promptChoiceOnce . "tvTarget" "Where the PC reports power changes (TV on/off)" (list "homeassistant" "homebridge") "homeassistant" -}}
+{{- $ha := dig "homeassistant" dict . -}}
+{{- $hb := dig "homebridge" dict . -}}
 [data]
 lanSubnet = {{ promptStringOnce . "lanSubnet" "LAN subnet allowed through the firewall" "192.168.0.0/24" | quote }}
+tvTarget = {{ $tvTarget | quote }}
+
+[data.homeassistant]
+{{- if eq $tvTarget "homeassistant" }}
+webhookUrl = {{ promptStringOnce . "homeassistant.webhookUrl" "Home Assistant webhook URL for the PC power automation (e.g. http://homeassistant.raspberrypi.lan/api/webhook/pc-power-<random>)" | quote }}
+{{- else if hasKey $ha "webhookUrl" }}
+webhookUrl = {{ $ha.webhookUrl | quote }}
+{{- end }}
+pcPowerKey = {{ promptStringOnce . "homeassistant.pcPowerKey" "Home Assistant SSH public key for the pc-power user (sudo cat /var/lib/hass/.ssh/id_ed25519.pub on the Pi; empty to skip)" "" | quote }}
 
 [data.homebridge]
+{{- if eq $tvTarget "homebridge" }}
 webhookBase = {{ promptStringOnce . "homebridge.webhookBase" "Homebridge Dummy webhook base URL (e.g. http://192.168.0.2:63743/)" | quote }}
 accessoryId = {{ promptStringOnce . "homebridge.accessoryId" "Homebridge Dummy accessory ID" | quote }}
-pcPowerKey = {{ promptStringOnce . "homebridge.pcPowerKey" "Homebridge SSH public key for the pc-power user" | quote }}
+{{- else if hasKey $hb "webhookBase" }}
+webhookBase = {{ $hb.webhookBase | quote }}
+accessoryId = {{ $hb.accessoryId | quote }}
+{{- end }}
+pcPowerKey = {{ promptStringOnce . "homebridge.pcPowerKey" "Homebridge SSH public key for the pc-power user (empty to skip)" "" | quote }}

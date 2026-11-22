@@ -1,5 +1,5 @@
 [Unit]
-Description=TV on after resume (Homebridge button)
+Description=TV on after resume (Home Assistant or Homebridge, per tvTarget)
 After=suspend.target
 
 [Service]

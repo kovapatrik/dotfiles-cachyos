@@ -1,5 +1,5 @@
 [Unit]
-Description=TV on at boot, TV off at shutdown (Homebridge button)
+Description=TV on at boot, TV off at shutdown (Home Assistant or Homebridge, per tvTarget)
 Wants=network-online.target
 After=network-online.target
 

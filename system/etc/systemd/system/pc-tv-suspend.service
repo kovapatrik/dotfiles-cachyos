@@ -1,5 +1,5 @@
 [Unit]
-Description=TV off before suspend (Homebridge button)
+Description=TV off before suspend (Home Assistant or Homebridge, per tvTarget)
 Before=sleep.target
 
 [Service]
