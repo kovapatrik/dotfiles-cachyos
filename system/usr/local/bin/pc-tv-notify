@@ -4,21 +4,37 @@
 #   homebridge    - press the Dummy button: wake = single press (TV on), sleep = double press (TV off)
 . /etc/pc-tv.conf
 case "$1" in
-  wake)  state=on;  press=0; retry="--retry 15 --retry-delay 2 --retry-all-errors" ;;
-  sleep) state=off; press=1; retry="" ;;
+  # wake: the network is gone for a few seconds after resume/boot - keep trying ~90 s
+  wake)  state=on;  press=0; tries=45 ;;
+  sleep) state=off; press=1; tries=1 ;;
   *)     echo "usage: pc-tv-notify wake|sleep" >&2; exit 2 ;;
 esac
+
+send() {
+  case "$TV_TARGET" in
+    homeassistant)
+      curl -fsS --max-time 3 -X POST \
+        -H 'Content-Type: application/json' -d "{\"state\":\"${state}\"}" \
+        "${HA_WEBHOOK_URL}" ;;
+    homebridge)
+      curl -fsS --max-time 3 \
+        "${WEBHOOK_BASE}?id=${ACCESSORY_ID}&set=ProgrammableSwitchEvent&value=${press}" ;;
+  esac
+}
+
 case "$TV_TARGET" in
-  homeassistant)
-    # shellcheck disable=SC2086
-    curl -fsS --max-time 3 $retry -X POST \
-      -H 'Content-Type: application/json' -d "{\"state\":\"${state}\"}" \
-      "${HA_WEBHOOK_URL}" ;;
-  homebridge)
-    # shellcheck disable=SC2086
-    curl -fsS --max-time 3 $retry \
-      "${WEBHOOK_BASE}?id=${ACCESSORY_ID}&set=ProgrammableSwitchEvent&value=${press}" ;;
-  *)
-    echo "pc-tv: unknown TV_TARGET '${TV_TARGET}'" >&2; exit 0 ;;
-esac \
-  && echo "pc-tv: sent $1 to ${TV_TARGET}" || { echo "pc-tv: failed to send $1 to ${TV_TARGET}" >&2; exit 0; }
+  homeassistant|homebridge) ;;
+  *) echo "pc-tv: unknown TV_TARGET '${TV_TARGET}'" >&2; exit 0 ;;
+esac
+
+# Retried here with a fresh curl each time, not with curl --retry: that reuses one process,
+# whose DNS cache keeps a failed lookup (made while the network was still down) for 60 s,
+# so every retry fails instantly with "Could not resolve host" even once DNS is back
+i=1
+until send; do
+  if [ "$i" -ge "$tries" ]; then
+    echo "pc-tv: failed to send $1 to ${TV_TARGET}" >&2; exit 0
+  fi
+  i=$((i + 1)); sleep 2
+done
+echo "pc-tv: sent $1 to ${TV_TARGET}"

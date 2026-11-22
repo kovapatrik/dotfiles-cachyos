@@ -4,7 +4,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-Type=oneshot
+# exec, not oneshot: the wake retries must not hold up boot (and the gamescope session)
+Type=exec
 RemainAfterExit=yes
 ExecStart=/usr/local/bin/pc-tv-notify wake
 ExecStop=/usr/local/bin/pc-tv-notify sleep
