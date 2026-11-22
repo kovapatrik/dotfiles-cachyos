@@ -1,0 +1,11 @@
+#!/bin/bash
+# Packages from .chezmoidata/packages.yaml. The list is rendered into this script, so
+# editing it re-runs the script.
+set -euo pipefail
+
+echo "==> Packages"
+sudo pacman -S --needed --noconfirm - <<'PKGS'
+{{ range .packages.pacman -}}
+{{ . }}
+{{ end -}}
+PKGS

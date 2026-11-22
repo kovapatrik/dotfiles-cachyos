@@ -23,7 +23,7 @@ The other target's details stay in the config, so switching back asks nothing.
 ## Layout
 | Path | What |
 | --- | --- |
-| `packages.txt` | Packages installed from the repos |
+| `.chezmoidata/packages.yaml` | Packages installed from the repos (`packages.pacman`) |
 | `system/` | Files copied to `/` (e.g. `system/etc/xbindkeysrc` → `/etc/xbindkeysrc`) |
 | `dot_config/hermes/` | Hermes streaming config → `~/.config/hermes/` |
 | `.chezmoitemplates/pc-tv.conf` | `/etc/pc-tv.conf`: `tvTarget` plus that target's webhook details |
@@ -33,7 +33,7 @@ The other target's details stay in the config, so switching back asks nothing.
 ### Setup scripts
 | Script | What |
 | --- | --- |
-| `10-packages` | `packages.txt` |
+| `install-packages` (`run_onchange_before_`, runs first) | `packages.pacman` from `.chezmoidata/packages.yaml` |
 | `20-hermes` | Hermes release package + Hermes-KMS (built from source), only when missing; evdi modprobe config; `hermes.service` |
 | `30-pc-power` | `pc-power` SSH user, its keys, sudoers; key-only sshd |
 | `40-pc-tv` | `pc-tv-notify`, `/etc/pc-tv.conf` and the boot/suspend/resume units |

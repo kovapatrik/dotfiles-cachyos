@@ -1,5 +1,0 @@
-openrgb
-tailscale
-wl-clipboard
-xbindkeys
-xclip

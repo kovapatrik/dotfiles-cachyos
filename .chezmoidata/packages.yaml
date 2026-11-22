@@ -1,0 +1,7 @@
+packages:
+  pacman:
+    - openrgb
+    - tailscale
+    - wl-clipboard
+    - xbindkeys
+    - xclip
