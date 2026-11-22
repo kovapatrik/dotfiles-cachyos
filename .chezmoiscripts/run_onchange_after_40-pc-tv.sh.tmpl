@@ -1,0 +1,18 @@
+#!/bin/bash
+# TV on/off webhook on boot, suspend, resume, shutdown (to tvTarget). Re-runs when
+# /etc/pc-tv.conf (rendered below) or these change:
+# {{ include "system/usr/local/bin/pc-tv-notify" | sha256sum }} pc-tv-notify
+# {{ include "system/etc/systemd/system/pc-tv-boot.service" | sha256sum }} pc-tv-boot.service
+# {{ include "system/etc/systemd/system/pc-tv-resume.service" | sha256sum }} pc-tv-resume.service
+# {{ include "system/etc/systemd/system/pc-tv-suspend.service" | sha256sum }} pc-tv-suspend.service
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> TV webhook ({{ .tvTarget }})"
+put 755 /usr/local/bin/pc-tv-notify
+sudo install -Dm 644 /dev/stdin /etc/pc-tv.conf <<'CONF'
+{{ includeTemplate "pc-tv.conf" . -}}
+CONF
+put 644 /etc/systemd/system/pc-tv-boot.service
+put 644 /etc/systemd/system/pc-tv-resume.service
+put 644 /etc/systemd/system/pc-tv-suspend.service
+sudo systemctl daemon-reload
+sudo systemctl enable pc-tv-boot.service pc-tv-resume.service pc-tv-suspend.service

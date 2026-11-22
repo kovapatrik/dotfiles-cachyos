@@ -1,0 +1,19 @@
+#!/bin/bash
+# Wake-on-LAN (also enable it in the BIOS) and Bluetooth controller wakeup. Re-runs when
+# these change:
+# {{ include "system/etc/udev/rules.d/10-bluetooth-wakeup.rules" | sha256sum }} 10-bluetooth-wakeup.rules
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> Wake-on-LAN"
+nmcli -t -f NAME,TYPE connection show | while IFS=: read -r name type; do
+    if [[ "$type" == "802-3-ethernet" ]]; then
+        sudo nmcli connection modify "$name" 802-3-ethernet.wake-on-lan magic
+    fi
+done
+
+echo "==> Bluetooth controller wakeup"
+put 644 /etc/udev/rules.d/10-bluetooth-wakeup.rules
+sudo udevadm control --reload
+# Apply the rule to the adapter that is already plugged in, not just on the next boot/replug
+# (same vendor/product as in the rule)
+sudo udevadm trigger --action=change --subsystem-match=usb \
+    --attr-match=idVendor=8087 --attr-match=idProduct=0029

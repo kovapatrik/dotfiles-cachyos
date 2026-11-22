@@ -1,0 +1,20 @@
+#!/bin/bash
+# Tailscale + ufw: tailnet, plus streaming and SSH from the LAN only. Re-runs when the
+# rules below (or lanSubnet) change.
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> Tailscale"
+sudo systemctl enable --now tailscaled.service
+
+echo "==> Firewall"
+lan={{ .lanSubnet | quote }}
+sudo ufw allow in on tailscale0
+sudo ufw allow 41641/udp
+sudo ufw allow from "$lan" to any port 47984,47989,48010 proto tcp   # Hermes streaming
+sudo ufw allow from "$lan" to any port 47998:48010 proto udp         # Hermes streaming
+sudo ufw allow from "$lan" to any port 22 proto tcp                  # SSH (pc-power: Homebridge / Home Assistant)
+sudo ufw --force enable
+sudo systemctl enable ufw.service
+
+if ! tailscale status >/dev/null 2>&1; then
+    echo "Tailscale is not logged in. Run: sudo tailscale up --login-server=<headscale URL> --ssh"
+fi

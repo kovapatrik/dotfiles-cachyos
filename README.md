@@ -27,7 +27,23 @@ The other target's details stay in the config, so switching back asks nothing.
 | `system/` | Files copied to `/` (e.g. `system/etc/xbindkeysrc` → `/etc/xbindkeysrc`) |
 | `dot_config/hermes/` | Hermes streaming config → `~/.config/hermes/` |
 | `.chezmoitemplates/pc-tv.conf` | `/etc/pc-tv.conf`: `tvTarget` plus that target's webhook details |
-| `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` | Installs everything above; re-runs when any of it changes |
+| `.chezmoitemplates/setup-lib.sh` | Shared header of the setup scripts (`set -euo pipefail`, `put`) |
+| `.chezmoiscripts/run_onchange_after_NN-*.sh.tmpl` | One setup script per area, run in `NN` order; each re-runs only when the files hashed in its header (or its config values) change |
+
+### Setup scripts
+| Script | What |
+| --- | --- |
+| `10-packages` | `packages.txt` |
+| `20-hermes` | Hermes release package + Hermes-KMS (built from source), only when missing; evdi modprobe config; `hermes.service` |
+| `30-pc-power` | `pc-power` SSH user, its keys, sudoers; key-only sshd |
+| `40-pc-tv` | `pc-tv-notify`, `/etc/pc-tv.conf` and the boot/suspend/resume units |
+| `50-rgb-off` | RGB off at boot |
+| `60-wakeup` | Wake-on-LAN on every ethernet connection; Bluetooth adapter wakeup udev rule |
+| `70-keybind` | Ctrl+Alt+D gamescope -> Plasma |
+| `80-network` | Tailscale, ufw rules |
+
+A file under `system/` is only installed if a script `put`s it - add new ones to the matching
+script and hash them in its header.
 
 ## What it sets up
 - **Hermes** streaming (release package + Hermes-KMS driver built from source)

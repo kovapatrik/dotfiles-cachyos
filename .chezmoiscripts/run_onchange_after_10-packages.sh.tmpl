@@ -1,0 +1,6 @@
+#!/bin/bash
+# Packages from the repos. Re-runs when packages.txt changes:
+# {{ include "packages.txt" | sha256sum }}
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> Packages"
+grep -v '^\s*$' "$src/packages.txt" | sudo pacman -S --needed --noconfirm -

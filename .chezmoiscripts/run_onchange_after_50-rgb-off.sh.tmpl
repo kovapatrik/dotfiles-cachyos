@@ -1,0 +1,10 @@
+#!/bin/bash
+# RGB off at boot (OpenRGB). Re-runs when these change:
+# {{ include "system/usr/local/bin/rgb-off" | sha256sum }} rgb-off
+# {{ include "system/etc/systemd/system/rgb-off.service" | sha256sum }} rgb-off.service
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> RGB off at boot"
+put 755 /usr/local/bin/rgb-off
+put 644 /etc/systemd/system/rgb-off.service
+sudo systemctl daemon-reload
+sudo systemctl enable rgb-off.service

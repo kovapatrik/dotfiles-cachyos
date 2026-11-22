@@ -1,0 +1,6 @@
+#!/bin/bash
+# Ctrl+Alt+D in the gamescope session switches to Plasma. Re-runs when this changes:
+# {{ include "system/etc/xbindkeysrc" | sha256sum }} xbindkeysrc
+{{ includeTemplate "setup-lib.sh" . }}
+echo "==> Gamescope -> Plasma keybind (Ctrl+Alt+D)"
+put 644 /etc/xbindkeysrc
