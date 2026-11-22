@@ -14,9 +14,16 @@ put() {
 
 echo "==> Packages"
 grep -v '^\s*$' "$src/packages.txt" | sudo pacman -S --needed --noconfirm -
-# Hermes streaming host: prebuilt package from https://github.com/MrOz59/Hermes/releases
-sudo pacman -U --needed --noconfirm \
-    https://github.com/MrOz59/Hermes/releases/download/v0.6.0/hermes-streaming-0.6.0-1-x86_64.pkg.tar.zst
+# Hermes streaming host: prebuilt package from https://github.com/MrOz59/Hermes/releases,
+# only when missing - updates are done by hand, so a newer installed version is kept
+if ! pacman -Q hermes-streaming >/dev/null 2>&1; then
+    # Downloaded first: given a URL, pacman also fetches a .sig, which the release doesn't have (404)
+    pkg_dir="$(mktemp -d)"
+    curl -fL --output-dir "$pkg_dir" -O \
+        https://github.com/MrOz59/Hermes/releases/download/v0.6.0/hermes-streaming-0.6.0-1-x86_64.pkg.tar.zst
+    sudo pacman -U --needed --noconfirm "$pkg_dir"/*.pkg.tar.zst
+    rm -rf "$pkg_dir"
+fi
 # Hermes-KMS virtual display driver: built from source, only when missing
 if ! pacman -Q hermes-kms-dkms-git hermes-kms-seatd-git >/dev/null 2>&1; then
     build_dir="$(mktemp -d)"
