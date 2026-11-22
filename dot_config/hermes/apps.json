@@ -1,66 +1,81 @@
 {
-  "apps": [
-    {
-      "allow-client-commands": false,
-      "image-path": "desktop.png",
-      "name": "Desktop",
-      "uuid": "F4CB321E-2E29-AD29-4B02-66919CE68338"
-    },
-    {
-      "allow-client-commands": false,
-      "image-path": "virtual_desktop.png",
-      "name": "Desktop (Virtual Display)",
-      "uuid": "BB9BEBE2-5D26-A422-1408-BC8BBE826AD7",
-      "virtual-display": true,
-      "virtual-display-layout": "exclusive"
-    },
-    {
-      "detached": [
-        "setsid steam steam://open/bigpicture"
-      ],
-      "image-path": "steam.png",
-      "name": "Steam Big Picture",
-      "prep-cmd": [
+    "apps": [
         {
-          "do": "",
-          "undo": "setsid steam steam://close/bigpicture"
-        }
-      ],
-      "uuid": "86BC3531-9A07-530E-CA85-0CE57F417CB3"
-    },
-    {
-      "auto-detach": false,
-      "cmd": "hermes-gamescope-launch",
-      "exit-timeout": 5,
-      "image-path": "steam.png",
-      "name": "Gamescope Steam Session",
-      "scale-factor": 100,
-      "uuid": "1B340A15-69B0-D22E-8B1A-7C8325F37DD8",
-      "virtual-display": true,
-      "virtual-display-layout": "mirror",
-      "wait-all": true,
-      "prep-cmd": [
+            "allow-client-commands": false,
+            "image-path": "desktop.png",
+            "name": "Desktop",
+            "uuid": "F4CB321E-2E29-AD29-4B02-66919CE68338"
+        },
         {
-          "do": "bash -c 'steam -shutdown 2>/dev/null || true; for i in $(seq 1 30); do pgrep -x steam >/dev/null 2>&1 || break; sleep 1; done; sleep 3'",
-          "undo": ""
-        }
-      ]
-    },
-    {
-      "allow-client-commands": false,
-      "image-path": "desktop.png",
-      "name": "Switch to Desktop",
-      "prep-cmd": [
+            "allow-client-commands": false,
+            "image-path": "detached-desktop.png",
+            "name": "Detached Desktop",
+            "session-type": "desktop",
+            "uuid": "5B1C7E0A-3D52-4F8E-9A61-2E7D0C4B9F13"
+        },
         {
-          "do": "steamos-session-select plasma",
-          "undo": ""
+            "allow-client-commands": false,
+            "image-path": "virtual_desktop.png",
+            "name": "Desktop (Virtual Display)",
+            "uuid": "BB9BEBE2-5D26-A422-1408-BC8BBE826AD7",
+            "virtual-display": true,
+            "virtual-display-layout": "exclusive"
+        },
+        {
+            "detached": [
+                "setsid steam steam://open/bigpicture"
+            ],
+            "image-path": "steam-big-picture.png",
+            "name": "Steam Big Picture",
+            "prep-cmd": [
+                {
+                    "do": "",
+                    "undo": "setsid steam steam://close/bigpicture"
+                }
+            ],
+            "uuid": "86BC3531-9A07-530E-CA85-0CE57F417CB3"
+        },
+        {
+            "allow-client-commands": false,
+            "cmd": "steam steam://open/bigpicture",
+            "image-path": "detached-steam.png",
+            "name": "Detached Steam",
+            "session-type": "desktop",
+            "uuid": "A4E2F6C8-1B37-4D95-8C0E-7F3A9D2B6E51"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "hermes-gamescope-launch",
+            "exit-timeout": 5,
+            "image-path": "steam-gamescope.png",
+            "name": "Gamescope Steam Session",
+            "prep-cmd": [
+                {
+                    "do": "bash -c 'steam -shutdown 2>/dev/null || true; for i in $(seq 1 30); do pgrep -x steam >/dev/null 2>&1 || break; sleep 1; done; sleep 3'",
+                    "undo": ""
+                }
+            ],
+            "scale-factor": 100,
+            "uuid": "1B340A15-69B0-D22E-8B1A-7C8325F37DD8",
+            "virtual-display": true,
+            "virtual-display-layout": "mirror",
+            "wait-all": true
+        },
+        {
+            "allow-client-commands": false,
+            "image-path": "desktop.png",
+            "name": "Switch to Desktop",
+            "prep-cmd": [
+                {
+                    "do": "steamos-session-select plasma",
+                    "undo": ""
+                }
+            ],
+            "uuid": "6420AE90-7642-120B-FC15-9345019FF091"
         }
-      ],
-      "uuid": "6420AE90-7642-120B-FC15-9345019FF091"
-    }
-  ],
-  "env": {
-    "PATH": "$(PATH):$(HOME)/.local/bin"
-  },
-  "version": 3
+    ],
+    "env": {
+        "PATH": "$(PATH):$(HOME)/.local/bin"
+    },
+    "version": 6
 }
